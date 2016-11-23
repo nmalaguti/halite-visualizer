@@ -17,10 +17,15 @@
 
 <body>
   <div id="container" class="container">
-    <div id="sharablelink"></div>
+    <div>
+      <a class="btn btn-default" href="?" role="button">New</a>
+      <span id="sharablelink"></span>
+    </div>
     <div id="pageContent" class="pageContent text-center">
       <div id="urlinput">
-        <input type="text" id="urlsrc" style="color: black" size="100" placeholder="https://www.example.com/replay.hlt" /> <input style="color: black" type="submit" id="submitbutton">
+        <form id="inputform">
+          <input type="text" id="urlsrc" style="color: black" size="100" placeholder="https://www.example.com/replay.hlt" /> <input style="color: black" type="submit" id="submitbutton">
+        </form>
       </div>
     </div>
   </div>
@@ -30,7 +35,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.2.2/pixi.min.js"></script>
   <script src="https://halite.io/script/parsereplay.js"></script>
   <script src="https://halite.io/script/visualizer.js"></script>
-  <script src="js/githubVisualizer.js"></script>
   <script type="text/javascript">
     function textFromAnyURL(url) {
         var oReq = new XMLHttpRequest();
@@ -69,7 +73,7 @@
     }
 
     $(function() {
-      $("#submitbutton").click(onSubmit);
+      $("#inputform").submit(onSubmit);
     })
 
     var url = getUrlParameter('url');
