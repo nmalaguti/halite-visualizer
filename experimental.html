@@ -1,0 +1,90 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Halite Visualizer</title>
+
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://halite.io/lib/bootstrap.min.css" rel="stylesheet">
+  <link href="https://halite.io/style/general.css" rel="stylesheet">
+
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+  <div id="container" class="container">
+    <div>
+      <a class="btn btn-default" href="?" role="button">New</a>
+      <span id="sharablelink"></span>
+    </div>
+    <div id="pageContent" class="pageContent text-center">
+      <div id="urlinput">
+        <form id="inputform">
+          <input type="text" id="urlsrc" style="color: black" size="100" placeholder="https://www.example.com/replay.hlt" /> <input style="color: black" type="submit" id="submitbutton">
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.2/lodash.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.0/seedrandom.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.2.2/pixi.min.js"></script>
+  <script src="https://halite.io/lib/xss.js"></script>
+  <script src="processFrame.js"></script>
+  <script src="parsereplay.js"></script>
+  <script src="visualizer.js"></script>
+  <script type="text/javascript">
+    function textFromAnyURL(url) {
+        var oReq = new XMLHttpRequest();
+        oReq.open("GET", url, true);
+        oReq.onload = function (oEvent) {
+            if (oReq.status != 404) {
+                $("#urlinput").remove();
+                showGame(textToGame(oReq.response, url), $("#pageContent"), null, null, true, false, true);
+            } else {
+                $("#pageContent").html("<h1>Gamefile not found</h1><p>The gamefile at \""+url+"\" could not be found.</h1>");
+            }
+        }
+        oReq.send(null);
+    }
+
+
+    function getUrlParameter(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : sParameterName[1];
+            }
+        }
+    };
+
+    function onSubmit(e) {
+      e.preventDefault();
+      window.location.href = "?url=" + encodeURIComponent($('#urlsrc').val())
+      return false;
+    }
+
+    $(function() {
+      $("#inputform").submit(onSubmit);
+    })
+
+    var url = getUrlParameter('url');
+
+    if (url) {
+      $("#sharablelink").html("<a href='" + window.location.href + "'>" + window.location.href + "</a>")
+      textFromAnyURL(url);
+    }
+  </script>
+</body>
+</html>
