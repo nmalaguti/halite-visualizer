@@ -71,7 +71,13 @@
 
     function onSubmit(e) {
       e.preventDefault();
-      window.location.href = "?url=" + encodeURIComponent($('#urlsrc').val())
+      var urlsrc = $('#urlsrc').val();
+      var parser = document.createElement('a');
+      parser.href = urlsrc;
+      if (parser.pathname.includes('game.php')) {
+        urlsrc = 'https://s3.amazonaws.com/halitereplaybucket/'.concat(parser.search.replace('?replay=',''))
+      }
+      window.location.href = "?url=" + encodeURIComponent(urlsrc)
       return false;
     }
 
