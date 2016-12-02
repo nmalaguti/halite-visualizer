@@ -10,6 +10,26 @@
   <link href="https://halite.io/lib/bootstrap.min.css" rel="stylesheet">
   <link href="https://halite.io/style/general.css" rel="stylesheet">
 
+  <style type="text/css">
+    *,*:after,*:before{box-sizing:border-box}html,body{margin:0;padding:0;height:100%;overflow:auto;font-family:sans-serif}
+    body.drag::before{content:'';position:fixed;top:0;left:0;bottom:0;right:0;background:rgba(204, 204, 204, 0.3);border:5px #cccccc dashed}
+
+    .glyphicon-refresh-animate {
+        -animation: spin .7s infinite linear;
+        -webkit-animation: spin2 .7s infinite linear;
+    }
+
+    @-webkit-keyframes spin2 {
+        from { -webkit-transform: rotate(0deg);}
+        to { -webkit-transform: rotate(360deg);}
+    }
+
+    @keyframes spin {
+        from { transform: scale(1) rotate(0deg);}
+        to { transform: scale(1) rotate(360deg);}
+    }
+  </style>
+
   <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
   <![endif]-->
@@ -29,6 +49,8 @@
       </div>
     </div>
   </div>
+  <script src="https://unpkg.com/drag-drop@2.12.1/dragdrop.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.3/pako.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.2/lodash.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
@@ -39,6 +61,47 @@
   <script src="parsereplay.js"></script>
   <script src="visualizer.js"></script>
   <script type="text/javascript">
+    function Uint8ToString(u8a){
+      var CHUNK_SZ = 0x8000;
+      var c = [];
+      for (var i=0; i < u8a.length; i+=CHUNK_SZ) {
+        c.push(String.fromCharCode.apply(null, u8a.subarray(i, i+CHUNK_SZ)));
+      }
+      return c.join("");
+    }
+    // You can pass in a DOM node or a selector string!
+    DragDrop('body', function (files) {
+        var file = files[0];
+        $("#pageContent").html("<h1><span class=\"glyphicon glyphicon-refresh glyphicon-refresh-animate\"></span> Uploading " + file.name + "...</h1>");
+
+
+        // convert the file to a Buffer that we can use!
+        var reader = new FileReader();
+
+        reader.addEventListener('load', function (e) {
+            // gzip -> base64 -> post
+            $.ajax({
+                type: "POST",
+                url: 'https://kp2by0c81b.execute-api.us-east-1.amazonaws.com/prod/uploadReplay?replay=' + encodeURIComponent(file.name),
+                data: btoa(Uint8ToString(pako.gzip(e.target.result))),
+                success: function (data) {
+                    window.location.href = "?url=" + encodeURIComponent(data.location)
+                },
+                error: function(xhr, err) {
+                    $("#pageContent").html("<h1>Uploading failed: " + xhr.responseText + "</h1>");
+                },
+                dataType: 'json',
+                contentType: 'application/json'
+            });
+        });
+
+        reader.addEventListener('error', function (err) {
+            console.error('FileReader error' + err);
+        });
+
+        reader.readAsText(file);
+    });
+
     function textFromAnyURL(url) {
         var oReq = new XMLHttpRequest();
         oReq.open("GET", url, true);
