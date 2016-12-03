@@ -208,7 +208,7 @@ function processFrame(game, frameNum) {
 
     if (frameNum + 1 < gameMap.num_frames - 1) {
         if (!_.isEqual(gameMap, game.frames[frameNum + 1])) {
-            console.log ("BUG BUG BUG");
+            throw new Error("Evaluated frame did not match actual game map for frame number " + frameNum);
         }
     }
 
