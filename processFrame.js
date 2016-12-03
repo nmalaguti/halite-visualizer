@@ -55,7 +55,8 @@ function processFrame(game, frameNum) {
             playerDamageDealt: 0,
             environmentDamageDealt: 0,
             damageTaken: 0,
-            capLosses: 0
+            capLosses: 0,
+            overkillDamage: 0,
         };
         for (y = 0; y < height; y++) {
             pieces[p][y] = [];
@@ -100,7 +101,7 @@ function processFrame(game, frameNum) {
             }
 
             // erase from the game map so that the player can't make another move with the same piece
-            gameMap[y][x] = [0, 0]
+            gameMap[y][x] = { owner: 0, strength: 0 };
         }
     }
 
@@ -126,6 +127,7 @@ function processFrame(game, frameNum) {
             for (p = 0; p < numPlayers; p++) {
                 // if player p has a piece at these coords
                 if (!_.isUndefined(pieces[p][y][x])) {
+                    var damageDone = 0;
                     // look for other players with pieces here
                     for (q = 0; q < numPlayers; q++) {
                         // exclude the same player
@@ -140,9 +142,11 @@ function processFrame(game, frameNum) {
                                     if (!_.isUndefined(toInjure[q][loc.y][loc.x])) {
                                         toInjure[q][loc.y][loc.x] += pieces[p][y][x];
                                         stats[p].playerDamageDealt += pieces[p][y][x];
+                                        damageDone += Math.min(pieces[p][y][x], pieces[q][loc.y][loc.x]);
                                     } else {
                                         toInjure[q][loc.y][loc.x] = pieces[p][y][x];
                                         stats[p].playerDamageDealt += pieces[p][y][x];
+                                        damageDone += Math.min(pieces[p][y][x], pieces[q][loc.y][loc.x]);
                                     }
                                 }
                             }
@@ -158,7 +162,12 @@ function processFrame(game, frameNum) {
                         }
                         // and apply damage to the environment
                         injureMap[y][x] += pieces[p][y][x];
+                        damageDone += Math.min(pieces[p][y][x], gameMap[y][x].strength);
                         stats[p].environmentDamageDealt += Math.min(pieces[p][y][x], gameMap[y][x].strength);
+                    }
+
+                    if (damageDone > pieces[p][y][x]) {
+                        stats[p].overkillDamage += damageDone - pieces[p][y][x];
                     }
                 }
             }

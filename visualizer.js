@@ -111,7 +111,7 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
             capLossText.anchor = new PIXI.Point(0, 1);
             capLossText.position = new PIXI.Point(mw + sh / 2.75, CAP_LOSS_TOP - sh * 0.005);
             stage.addChild(capLossText);
-            plrDmgDltText = new PIXI.Text('Player Damage', { font: (sh / 38).toString() + 'px Arial', fill: 0xffffff });
+            plrDmgDltText = new PIXI.Text('Overkill Damage', { font: (sh / 38).toString() + 'px Arial', fill: 0xffffff });
             plrDmgDltText.anchor = new PIXI.Point(0, 1);
             plrDmgDltText.position = new PIXI.Point(mw + sh / 32, PLR_DMG_TOP - sh * 0.005);
             stage.addChild(plrDmgDltText);
