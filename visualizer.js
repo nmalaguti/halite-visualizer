@@ -65,7 +65,7 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
             if(allowedWidth < allowedHeight*5/3) {
                 sw = allowedWidth, sh = allowedWidth*3/5;
             } else {
-                sw = allowedHeight*4/3, sh = allowedHeight;
+                sw = allowedHeight*5/3, sh = allowedHeight;
             }
             mw = sh, mh = sh;
             renderer.resize(sw, sh);
